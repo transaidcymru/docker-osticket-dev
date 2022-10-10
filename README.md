@@ -3,7 +3,7 @@ docker-osticket
 
 # Introduction
 
-Docker image for running version 1.16 of [osTicket](http://osticket.com/).
+Docker image for running version 1.17 of [osTicket](http://osticket.com/).
 
 This image has been created from the original docker-osticket image by
 [Petter A. Helset](mailto:petter@helset.eu).

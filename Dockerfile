@@ -59,8 +59,8 @@ RUN set -ex; \
     rm -rf /tmp/pear /var/cache/apk/*
 # DO NOT FORGET TO CHECK THE LANGUAGE PACK DOWNLOAD URL BELOW
 # DO NOT FORGET TO UPDATE "image-version" FILE
-ENV OSTICKET_VERSION=1.16.3 \
-    OSTICKET_SHA256SUM=7d9c1ae7663e66d189b70d29fe02844d5ec2324a0f4cca545205a55f29ff72aa
+ENV OSTICKET_VERSION=1.17 \
+    OSTICKET_SHA256SUM=296d55cc50782411f0ba81101bc64fc4f6ac65a37772fd75bb5f4dc04d8b364d
 RUN set -ex; \
     \
     wget -q -O osTicket.zip https://github.com/osTicket/osTicket/releases/download/\
