@@ -83,23 +83,16 @@ v${OSTICKET_VERSION}/osTicket-v${OSTICKET_VERSION}.zip; \
         wget -q -O /var/www/html/include/i18n/${lang}.phar \
             https://s3.amazonaws.com/downloads.osticket.com/lang/1.14.x/${lang}.phar; \
     done
-ENV OSTICKET_PLUGINS_VERSION=cc4bf22f17cc0bebd1e1958786a271f02d7f2645 \
-    OSTICKET_PLUGINS_SHA256SUM=c34f9bee929eb256d62aee57b458d89e6a8dc258948a5850f9f314aa44fd20d8
 RUN set -ex; \
     \
-    wget -q -O osTicket-plugins.tar.gz https://github.com/devinsolutions/osTicket-plugins/archive/\
-${OSTICKET_PLUGINS_VERSION}.tar.gz; \
-    echo "${OSTICKET_PLUGINS_SHA256SUM}  osTicket-plugins.tar.gz" | sha256sum -c; \
-    tar -xzf osTicket-plugins.tar.gz --one-top-level --strip-components 1; \
-    rm osTicket-plugins.tar.gz; \
-    \
-    cd osTicket-plugins; \
-    php make.php hydrate; \
-    find * -maxdepth 0 -type d ! -path doc ! -path lib -exec mv '{}' \
-        /var/www/html/include/plugins +; \
-    cd ..; \
-    \
-    rm -r osTicket-plugins /root/.composer
+    for plugin in audit auth-2fa auth-ldap auth-passthru auth-password-policy storage-fs; do \
+        wget -q -O /var/www/html/include/plugins/${plugin}.phar \
+            https://s3.amazonaws.com/downloads.osticket.com/plugin/${plugin}.phar; \
+    done; \
+    for plugin in auth-oauth2 storage-s3; do \
+        wget -q -O /var/www/html/include/plugins/${plugin}.phar \
+            https://s3.amazonaws.com/downloads.osticket.com/plugin/1.17.x/${plugin}.phar; \
+    done
 ENV OSTICKET_SLACK_VERSION=de1d9a276a64520eea6e6368e609a0f4c4829d96 \
     OSTICKET_SLACK_SHA256SUM=8d06500fd5b8a589a5f7103c242160086ca1696a5b93d0e3767119a54059532b
 RUN set -ex; \

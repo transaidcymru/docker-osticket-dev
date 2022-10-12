@@ -2,6 +2,19 @@
 # (C) Campbell Software Solutions 2015
 set -e
 
+cat <<EOM
+== MANUAL INTERVENTION MAY BE REQUIRED IF UPGRADING FROM 1.16.3 OR EARLIER ==
+
+If you are upgrading from an image tagged 1.16.3 or earlier, there may be
+breaking changes related to how plugins are shipped in this image.
+
+Please, take a moment to read
+https://github.com/devinsolutions/docker-osticket#upgrading, and perform manual
+intervention if required.
+
+== MANUAL INTERVENTION MAY BE REQUIRED IF UPGRADING FROM 1.16.3 OR EARLIER ==
+EOM
+
 # Automate installation
 php /usr/local/src/osticket/setup/install.php
 echo Applying configuration file security
