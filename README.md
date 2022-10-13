@@ -22,7 +22,7 @@ It has a few modifications:
   * EMail support
 
 osTicket is being served by [nginx](http://wiki.nginx.org/Main) using
-[PHP-FPM](http://php-fpm.org/) with PHP 8.0.
+[PHP-FPM](http://php-fpm.org/) with PHP 8.1.
 PHP [mail](http://php.net/manual/en/function.mail.php) function is configured to use
 [msmtp](http://msmtp.sourceforge.net/) to send out-going messages.
 

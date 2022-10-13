@@ -1,4 +1,4 @@
-FROM php:8.0-fpm-alpine3.16
+FROM php:8.1-fpm-alpine3.16
 RUN set -ex; \
     \
     export CFLAGS="-Os"; \
