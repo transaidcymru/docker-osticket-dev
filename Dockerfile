@@ -100,8 +100,8 @@ ${OSTICKET_PLUGINS_VERSION}.tar.gz; \
     cd ..; \
     \
     rm -r osTicket-plugins /root/.composer
-ENV OSTICKET_SLACK_VERSION=cd98e54fcadf1a5dd8e78b0a0380561c7ef29b02 \
-    OSTICKET_SLACK_SHA256SUM=9cdead701fd1be91a64451dfaca98148b997dc4e5a0ff1a61965bffeebd65540
+ENV OSTICKET_SLACK_VERSION=de1d9a276a64520eea6e6368e609a0f4c4829d96 \
+    OSTICKET_SLACK_SHA256SUM=8d06500fd5b8a589a5f7103c242160086ca1696a5b93d0e3767119a54059532b
 RUN set -ex; \
     \
     wget -q -O osTicket-slack-plugin.tar.gz https://github.com/devinsolutions/\
