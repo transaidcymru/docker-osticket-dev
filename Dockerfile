@@ -82,6 +82,9 @@ v${OSTICKET_VERSION}/osTicket-v${OSTICKET_VERSION}.zip; \
         # used even for minor versions >= 14.
         wget -q -O /var/www/html/include/i18n/${lang}.phar \
             https://s3.amazonaws.com/downloads.osticket.com/lang/1.14.x/${lang}.phar; \
+        # Throws exception and returns non-zero if .phar can't be loaded (e.g. due to checksum
+        # mismatch)
+        php -r "new Phar(\"/var/www/html/include/i18n/${lang}.phar\");"; \
     done
 RUN set -ex; \
     \
@@ -92,6 +95,13 @@ RUN set -ex; \
     for plugin in auth-oauth2 storage-s3; do \
         wget -q -O /var/www/html/include/plugins/${plugin}.phar \
             https://s3.amazonaws.com/downloads.osticket.com/plugin/1.17.x/${plugin}.phar; \
+    done; \
+    # This checks `.phar` integrity (authenticity check is not supported - see
+    # https://github.com/osTicket/osTicket/issues/6376).
+    for phar in /var/www/html/include/plugins/*.phar; do \
+        # The following PHP code throws an exception and returns non-zero if .phar can't be loaded
+        # (e.g. due to a checksum mismatch)
+        php -r "new Phar(\"${phar}\");"; \
     done
 ENV OSTICKET_SLACK_VERSION=de1d9a276a64520eea6e6368e609a0f4c4829d96 \
     OSTICKET_SLACK_SHA256SUM=8d06500fd5b8a589a5f7103c242160086ca1696a5b93d0e3767119a54059532b
