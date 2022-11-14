@@ -97,7 +97,7 @@ Manual upgrade steps:
       username/password.
     - If you can remove the old plugin now, do so. If that's not possible, we will remove it later,
       but those steps are more difficult.
-    - Switch to tag 1.17.0
+    - Switch to tag 1.17.x
     - Log in, and run the osTicket upgrader.
     - Set up the `auth-oauth2` plugin.
     - If you haven't removed the old plugin previously, let's do so now. Since it is not present in
@@ -110,7 +110,7 @@ Manual upgrade steps:
       - Delete the missing plugin: `DELETE FROM ost_plugin WHERE id=<id>;` (replace `<id>` with the
         one corresponding to the plugin to be removed).
 
- 3. Switch to tag 1.17.0 (if you skipped step 2).
+ 3. Switch to tag 1.17.x (if you skipped step 2).
  4. If you are using any of `audit` `auth-2fa` `auth-ldap` `auth-passthru` `auth-password-policy`
     `storage-fs` or `storage-s3` plugins:
 
@@ -127,7 +127,7 @@ Manual upgrade steps:
 
  5. Run the osTicket upgrader (if you skipped step 2).
 
-Note: If you upgraded to 1.17.0 and can't log in (because auth plugins no longer work and you have
+Note: If you upgraded to 1.17.x and can't log in (because auth plugins no longer work and you have
 not yet created a user that can log in with username/password), and you have not yet run osTicket
 upgrader (this image does not run it automatically, it has to be run manually after the first Admin
 login), it is should be safe to roll back to 1.16.3.
