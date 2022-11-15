@@ -1,3 +1,5 @@
+# syntax=docker/dockerfile:1.3
+
 FROM php:8.1-fpm-alpine3.16
 RUN set -ex; \
     \
@@ -61,7 +63,9 @@ RUN set -ex; \
 # DO NOT FORGET TO UPDATE "image-version" FILE
 ENV OSTICKET_VERSION=1.17.2 \
     OSTICKET_SHA256SUM=53aa6349c0ee6367d4370cc663a8047d3038f5e0d3668f42b3f90f20534fb717
-RUN set -ex; \
+RUN --mount=type=bind,source=utils/verify-plugin.php,target=/tmp/verify-plugin.php,readonly \
+    \
+    set -ex; \
     \
     wget -q -O osTicket.zip https://github.com/osTicket/osTicket/releases/download/\
 v${OSTICKET_VERSION}/osTicket-v${OSTICKET_VERSION}.zip; \
@@ -75,16 +79,16 @@ v${OSTICKET_VERSION}/osTicket-v${OSTICKET_VERSION}.zip; \
     # Hide setup
     rm -r /var/www/html/setup; \
     \
-    for lang in ar_EG ar_SA az bg bn bs ca cs da de el es_AR es_ES es_MX et eu fa fi fr gl he hi \
-        hr hu id is it ja ka km ko lt lv mk mn ms nl no pl pt_BR pt_PT ro ru sk sl sq sr sr_CS \
-        sv_SE sw th tr uk ur_IN ur_PK vi zh_CN zh_TW; do \
+    cd /var/www/html; \
+    \
+    for lang in bg bn bs ca cs da de el es_AR es_ES es_MX et eu fa fi fr gl he hi hr hu id is it \
+        ja ka km ko lt lv mk mn ms nl no pl pt_BR pt_PT ro ru sk sl sq sr sr_CS sv_SE sw th tr uk \
+        ur_IN ur_PK vi zh_CN zh_TW; do \
         # This URL is the same as what is used by the official osTicket Downloads page. This URL is
         # used even for minor versions >= 14.
         wget -q -O /var/www/html/include/i18n/${lang}.phar \
             https://s3.amazonaws.com/downloads.osticket.com/lang/1.14.x/${lang}.phar; \
-        # Throws exception and returns non-zero if .phar can't be loaded (e.g. due to checksum
-        # mismatch)
-        php -r "new Phar(\"/var/www/html/include/i18n/${lang}.phar\");"; \
+        php /tmp/verify-plugin.php "/var/www/html/include/i18n/${lang}.phar"; \
     done
 RUN set -ex; \
     \
