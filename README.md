@@ -3,7 +3,10 @@ docker-osticket
 
 # Introduction
 
-Docker image for running version 1.16 of [osTicket](http://osticket.com/).
+Docker image for running version 1.17 of [osTicket](http://osticket.com/).
+
+**Important! If upgrading from images <1.17.0, read the upgrade instructions below, as images 1.17.0
+and later have plugin-related breaking changes.**
 
 This image has been created from the original docker-osticket image by
 [Petter A. Helset](mailto:petter@helset.eu).
@@ -19,7 +22,7 @@ It has a few modifications:
   * EMail support
 
 osTicket is being served by [nginx](http://wiki.nginx.org/Main) using
-[PHP-FPM](http://php-fpm.org/) with PHP 8.0.
+[PHP-FPM](http://php-fpm.org/) with PHP 8.1.
 PHP [mail](http://php.net/manual/en/function.mail.php) function is configured to use
 [msmtp](http://msmtp.sourceforge.net/) to send out-going messages.
 
@@ -69,6 +72,65 @@ docker run -d \
 
 Note (2): osTicket automatically redirects `http://localhost:8080/scp` to `http://localhost/scp/`.
 Either serve this on port 80 or don't omit the trailing slash after `scp/`!
+
+# Upgrading
+
+## Upgrading from image tag 1.16.3 or earlier
+
+There are breaking changes in images tagged 1.17.0 and later, related to how plugins are shipped.
+When upgrading from image tag 1.16.3 or earlier, and plugins are used on the installation, manual
+intervention may be required.
+
+Breaking changes are:
+
+- Plugins `auth-oauth` and `auth-cas` are no longer included in this image. Plugin `auth-oauth` was
+  superseded by a new plugin `auth-oauth2`.
+- Plugins are no longer installed as directories. Instead, they are installed as `.phar` archives.
+
+Manual upgrade steps:
+
+ 1. As a precaution (as before any upgrade), perform a full DB backup.
+ 2. If you are using one of the auth plugins that are no longer available in this image, and want to
+    migrate to `auth-oauth2`:
+
+    - Before upgrading, create a temporary user with Admin privileges that can authenticate via
+      username/password.
+    - If you can remove the old plugin now, do so. If that's not possible, we will remove it later,
+      but those steps are more difficult.
+    - Switch to tag 1.17.x
+    - Log in, and run the osTicket upgrader.
+    - Set up the `auth-oauth2` plugin.
+    - If you haven't removed the old plugin previously, let's do so now. Since it is not present in
+      the image, it will show as "(defunct — missing)". Attempting to remove it will lead to Error
+      500, as the removal process requires the plugin to be present. We will have to remove it from
+      the DB manually.
+
+      - Open a shell to `MariaDB` / `MySQL` osTicket database.
+      - List contents of the `ost_plugin` table (`SELECT * FROM ost_plugin;`).
+      - Delete the missing plugin: `DELETE FROM ost_plugin WHERE id=<id>;` (replace `<id>` with the
+        one corresponding to the plugin to be removed).
+
+ 3. Switch to tag 1.17.x (if you skipped step 2).
+ 4. If you are using any of `audit` `auth-2fa` `auth-ldap` `auth-passthru` `auth-password-policy`
+    `storage-fs` or `storage-s3` plugins:
+
+    - These are no longer installed as folders but are installed as `.phar`s. We need to update
+      osTicket database so that entry in the plugins table points to the new location.
+    - Open a shell to `MariaDB` / `MySQL` osTicket database.
+    - List contents of the `ost_plugin` table (`SELECT * FROM ost_plugin;`)
+    - If any of the plugins mentioned above are installed, for each one do:
+      `UPDATE ost_plugin SET install_path="<original-path>.phar", isphar=1 WHERE id=<id>;`
+      (replace `<original-path>` and `<id>` by values from `install_path` and `id` columns. For
+      example, for plugin installed as `id` 3, with install path `plugins/auth-passthru`, the
+      `UPDATE` statement will be
+      `UPDATE ost_plugin SET install_path="plugins/auth-passthru.phar", isphar=1 WHERE id=3;`)
+
+ 5. Run the osTicket upgrader (if you skipped step 2).
+
+Note: If you upgraded to 1.17.x and can't log in (because auth plugins no longer work and you have
+not yet created a user that can log in with username/password), and you have not yet run osTicket
+upgrader (this image does not run it automatically, it has to be run manually after the first Admin
+login), it is should be safe to roll back to 1.16.3.
 
 # MySQL connection
 

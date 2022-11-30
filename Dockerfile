@@ -1,4 +1,6 @@
-FROM php:8.0-fpm-alpine3.16
+# syntax=docker/dockerfile:1.3
+
+FROM php:8.1-fpm-alpine3.16
 RUN set -ex; \
     \
     export CFLAGS="-Os"; \
@@ -59,9 +61,11 @@ RUN set -ex; \
     rm -rf /tmp/pear /var/cache/apk/*
 # DO NOT FORGET TO CHECK THE LANGUAGE PACK DOWNLOAD URL BELOW
 # DO NOT FORGET TO UPDATE "image-version" FILE
-ENV OSTICKET_VERSION=1.16.3 \
-    OSTICKET_SHA256SUM=7d9c1ae7663e66d189b70d29fe02844d5ec2324a0f4cca545205a55f29ff72aa
-RUN set -ex; \
+ENV OSTICKET_VERSION=1.17.2 \
+    OSTICKET_SHA256SUM=53aa6349c0ee6367d4370cc663a8047d3038f5e0d3668f42b3f90f20534fb717
+RUN --mount=type=bind,source=utils/verify-plugin.php,target=/tmp/verify-plugin.php,readonly \
+    \
+    set -ex; \
     \
     wget -q -O osTicket.zip https://github.com/osTicket/osTicket/releases/download/\
 v${OSTICKET_VERSION}/osTicket-v${OSTICKET_VERSION}.zip; \
@@ -75,33 +79,36 @@ v${OSTICKET_VERSION}/osTicket-v${OSTICKET_VERSION}.zip; \
     # Hide setup
     rm -r /var/www/html/setup; \
     \
-    for lang in ar_EG ar_SA az bg bn bs ca cs da de el es_AR es_ES es_MX et eu fa fi fr gl he hi \
-        hr hu id is it ja ka km ko lt lv mk mn ms nl no pl pt_BR pt_PT ro ru sk sl sq sr sr_CS \
-        sv_SE sw th tr uk ur_IN ur_PK vi zh_CN zh_TW; do \
+    cd /var/www/html; \
+    \
+    for lang in bg bn bs ca cs da de el es_AR es_ES es_MX et eu fa fi fr gl he hi hr hu id is it \
+        ja ka km ko lt lv mk mn ms nl no pl pt_BR pt_PT ro ru sk sl sq sr sr_CS sv_SE sw th tr uk \
+        ur_IN ur_PK vi zh_CN zh_TW; do \
         # This URL is the same as what is used by the official osTicket Downloads page. This URL is
         # used even for minor versions >= 14.
         wget -q -O /var/www/html/include/i18n/${lang}.phar \
             https://s3.amazonaws.com/downloads.osticket.com/lang/1.14.x/${lang}.phar; \
+        php /tmp/verify-plugin.php "/var/www/html/include/i18n/${lang}.phar"; \
     done
-ENV OSTICKET_PLUGINS_VERSION=cc4bf22f17cc0bebd1e1958786a271f02d7f2645 \
-    OSTICKET_PLUGINS_SHA256SUM=c34f9bee929eb256d62aee57b458d89e6a8dc258948a5850f9f314aa44fd20d8
 RUN set -ex; \
     \
-    wget -q -O osTicket-plugins.tar.gz https://github.com/devinsolutions/osTicket-plugins/archive/\
-${OSTICKET_PLUGINS_VERSION}.tar.gz; \
-    echo "${OSTICKET_PLUGINS_SHA256SUM}  osTicket-plugins.tar.gz" | sha256sum -c; \
-    tar -xzf osTicket-plugins.tar.gz --one-top-level --strip-components 1; \
-    rm osTicket-plugins.tar.gz; \
-    \
-    cd osTicket-plugins; \
-    php make.php hydrate; \
-    find * -maxdepth 0 -type d ! -path doc ! -path lib -exec mv '{}' \
-        /var/www/html/include/plugins +; \
-    cd ..; \
-    \
-    rm -r osTicket-plugins /root/.composer
-ENV OSTICKET_SLACK_VERSION=cd98e54fcadf1a5dd8e78b0a0380561c7ef29b02 \
-    OSTICKET_SLACK_SHA256SUM=9cdead701fd1be91a64451dfaca98148b997dc4e5a0ff1a61965bffeebd65540
+    for plugin in audit auth-2fa auth-ldap auth-passthru auth-password-policy storage-fs; do \
+        wget -q -O /var/www/html/include/plugins/${plugin}.phar \
+            https://s3.amazonaws.com/downloads.osticket.com/plugin/${plugin}.phar; \
+    done; \
+    for plugin in auth-oauth2 storage-s3; do \
+        wget -q -O /var/www/html/include/plugins/${plugin}.phar \
+            https://s3.amazonaws.com/downloads.osticket.com/plugin/1.17.x/${plugin}.phar; \
+    done; \
+    # This checks `.phar` integrity (authenticity check is not supported - see
+    # https://github.com/osTicket/osTicket/issues/6376).
+    for phar in /var/www/html/include/plugins/*.phar; do \
+        # The following PHP code throws an exception and returns non-zero if .phar can't be loaded
+        # (e.g. due to a checksum mismatch)
+        php -r "new Phar(\"${phar}\");"; \
+    done
+ENV OSTICKET_SLACK_VERSION=de1d9a276a64520eea6e6368e609a0f4c4829d96 \
+    OSTICKET_SLACK_SHA256SUM=8d06500fd5b8a589a5f7103c242160086ca1696a5b93d0e3767119a54059532b
 RUN set -ex; \
     \
     wget -q -O osTicket-slack-plugin.tar.gz https://github.com/devinsolutions/\
