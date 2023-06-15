@@ -92,13 +92,10 @@ v${OSTICKET_VERSION}/osTicket-v${OSTICKET_VERSION}.zip; \
     done
 RUN set -ex; \
     \
-    for plugin in audit auth-2fa auth-ldap auth-passthru auth-password-policy storage-fs; do \
+    for plugin in audit auth-2fa auth-ldap auth-oauth2 auth-passthru auth-password-policy \
+        storage-fs storage-s3; do \
         wget -q -O /var/www/html/include/plugins/${plugin}.phar \
             https://s3.amazonaws.com/downloads.osticket.com/plugin/${plugin}.phar; \
-    done; \
-    for plugin in auth-oauth2 storage-s3; do \
-        wget -q -O /var/www/html/include/plugins/${plugin}.phar \
-            https://s3.amazonaws.com/downloads.osticket.com/plugin/1.17.x/${plugin}.phar; \
     done; \
     # This checks `.phar` integrity (authenticity check is not supported - see
     # https://github.com/osTicket/osTicket/issues/6376).
