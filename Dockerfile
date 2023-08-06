@@ -3,9 +3,9 @@
 FROM php:8.1-fpm-alpine3.16
 RUN set -ex; \
     \
-    export CFLAGS="-Os"; \
-    export CPPFLAGS="${CFLAGS}"; \
-    export LDFLAGS="-Wl,--strip-all"; \
+    export CFLAGS="${PHP_CFLAGS:?}"; \
+    export CPPFLAGS="${PHP_CPPFLAGS:?}"; \
+    export LDFLAGS="${PHP_LDFLAGS:?} -Wl,--strip-all"; \
     \
     # Runtime dependencies
     apk add --no-cache \
