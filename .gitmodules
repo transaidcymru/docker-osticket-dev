@@ -1,6 +1,3 @@
-[submodule "osTicket"]
-	path = osTicket
-	url = https://github.com/osTicket/osTicket
 [submodule "osticket-api"]
 	path = osticket-api
-	url = https://github.com/BMSVieira/osticket-api
+	url = git@github.com:transaidcymru/osticket-api.git

@@ -115,6 +115,8 @@ RUN set -ex; \
 #        osTicket-slack-plugin-${OSTICKET_SLACK_VERSION}/slack; \
 #    rm osTicket-slack-plugin.tar.gz
 COPY root /
+# hmmmm not sure about this one
+COPY osticket-api/ost_wbs/ /var/www/html/ost_wbs
 CMD ["start"]
 STOPSIGNAL SIGTERM
 EXPOSE 80
