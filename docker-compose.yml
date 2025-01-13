@@ -6,6 +6,9 @@ services:
       MYSQL_DATABASE: osticket
       MYSQL_USER: osticket
       MYSQL_PASSWORD: secret
+    volumes:
+      - mysql-data:/var/lib/mysql
+
   osticket:
     build: .
     environment:
@@ -16,3 +19,9 @@ services:
     ports:
       - 8080:80
     restart: on-failure
+    volumes:
+      - osticket-data:/var/www/html
+
+volumes:
+  mysql-data:
+  osticket-data:
