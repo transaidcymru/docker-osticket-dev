@@ -61,8 +61,8 @@ RUN set -ex; \
     rm -rf /tmp/pear /var/cache/apk/*
 # DO NOT FORGET TO CHECK THE LANGUAGE PACK DOWNLOAD URL BELOW
 # DO NOT FORGET TO UPDATE "image-version" FILE
-ENV OSTICKET_VERSION=1.17.5 \
-    OSTICKET_SHA256SUM=a9d64b67008c64ae2009ee8abda7354c34ff4486666f931d3012988dd6538bc9
+ENV OSTICKET_VERSION=1.18.1 \
+    OSTICKET_SHA256SUM=0802d63ed0705652d2c142b03a4bdb77a6ddec0832dfbf2748a2be38ded8ffeb
 RUN --mount=type=bind,source=utils/verify-plugin.php,target=/tmp/verify-plugin.php,readonly \
     \
     set -ex; \
@@ -104,16 +104,16 @@ RUN set -ex; \
         # (e.g. due to a checksum mismatch)
         php -r "new Phar(\"${phar}\");"; \
     done
-ENV OSTICKET_SLACK_VERSION=de1d9a276a64520eea6e6368e609a0f4c4829d96 \
-    OSTICKET_SLACK_SHA256SUM=8d06500fd5b8a589a5f7103c242160086ca1696a5b93d0e3767119a54059532b
-RUN set -ex; \
-    \
-    wget -q -O osTicket-slack-plugin.tar.gz https://github.com/devinsolutions/\
-osTicket-slack-plugin/archive/${OSTICKET_SLACK_VERSION}.tar.gz; \
-    echo "${OSTICKET_SLACK_SHA256SUM}  osTicket-slack-plugin.tar.gz" | sha256sum -c; \
-    tar -xzf osTicket-slack-plugin.tar.gz -C /var/www/html/include/plugins --strip-components 1 \
-        osTicket-slack-plugin-${OSTICKET_SLACK_VERSION}/slack; \
-    rm osTicket-slack-plugin.tar.gz
+#ENV OSTICKET_SLACK_VERSION=de1d9a276a64520eea6e6368e609a0f4c4829d96 \
+#    OSTICKET_SLACK_SHA256SUM=8d06500fd5b8a589a5f7103c242160086ca1696a5b93d0e3767119a54059532b
+#RUN set -ex; \
+#    \
+#    wget -q -O osTicket-slack-plugin.tar.gz https://github.com/devinsolutions/\
+#osTicket-slack-plugin/archive/${OSTICKET_SLACK_VERSION}.tar.gz; \
+#    echo "${OSTICKET_SLACK_SHA256SUM}  osTicket-slack-plugin.tar.gz" | sha256sum -c; \
+#    tar -xzf osTicket-slack-plugin.tar.gz -C /var/www/html/include/plugins --strip-components 1 \
+#        osTicket-slack-plugin-${OSTICKET_SLACK_VERSION}/slack; \
+#    rm osTicket-slack-plugin.tar.gz
 COPY root /
 CMD ["start"]
 STOPSIGNAL SIGTERM

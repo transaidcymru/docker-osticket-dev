@@ -1,4 +1,3 @@
-version: '3'
 services:
   mysql:
     image: mysql:5.7
@@ -8,7 +7,7 @@ services:
       MYSQL_USER: osticket
       MYSQL_PASSWORD: secret
   osticket:
-    image: devinsolutions/osticket:latest
+    build: .
     environment:
       MYSQL_HOST: mysql
       MYSQL_DATABASE: osticket
